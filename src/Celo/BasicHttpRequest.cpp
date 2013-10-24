@@ -98,6 +98,7 @@ void BasicHttpRequest::send_head( const char *url ) {
     SH( ".png" , "image/png" );
     SH( ".jpg" , "image/jpg" );
     SH( ".jpeg", "image/jpg" );
+    SH( ".tiff", "image/tiff" );
     SH( ".js"  , "text/javascript" );
 
     // default  -> plain text
