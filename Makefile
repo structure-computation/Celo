@@ -8,6 +8,9 @@ cmp: inst_dir ext/Sipe
 	make -C ext/Sipe
 	${MCP} -ne -o -DSCEEN listener_generator src/Celo/listener_generator.cpp
 
+test_%:
+	${MCP} tests/$@.cpp
+
 ext/Sipe:
 	mkdir -p ext; cd ext; test -e Sipe || ( test -e ../../Sipe && ln -s `pwd`/../../Sipe . ) || git clone git@github.com:structure-computation/Sipe.git
 

@@ -18,23 +18,45 @@
 */
 
 
+#include "EventObj_SSL.h"
+#include <unistd.h>
+#include <errno.h>
+
 #include "StringHelp.h"
-#include "SocketHelp.h"
-#include "EventLoop.h"
-#include "Listener.h"
 
-Listener::Listener( const char *port ) : EventObj( listening_socket( port ) ) {
+EventObj_SSL::EventObj_SSL( int fd ) : EventObj( fd ) {
 }
 
-Listener::Listener( VtableOnly vo ) : EventObj( vo ) {
+EventObj_SSL::EventObj_SSL( VtableOnly vo ) : EventObj( vo ) {
 }
 
-bool Listener::inp() {
+bool EventObj_SSL::inp() {
+    const int size_buff = 2048;
+    char buff[ size_buff ];
     while ( true ) {
-        int nd = accepting_socket( fd );
-        if ( nd == -1 )
-            return true; // continue to listen
-        if ( EventObj *eo = event_obj_factory( nd ) )
-            *ev_loop << eo;
+        ST ruff = read( fd, buff, size_buff );
+        if ( ruff < 0 ) {
+            // EAGAIN
+            if ( errno == EAGAIN )
+                return true;
+            return false;
+        }
+
+        // we need more data but we don't have ?
+        if ( ruff == 0 )
+            return true;
+
+        // parse
+        // write( 0, buff, ruff );
+        int p = parse( buff, buff + ruff );
+
+        if ( p )
+            return p < 0;
     }
 }
+
+bool EventObj_SSL::cnt_default_value() const {
+    return false;
+}
+
+
